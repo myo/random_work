@@ -1,0 +1,178 @@
+<!doctype HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #formular {
+      border: 1px dashed;
+    }
+    #formular > * {
+      margin-left: 5%;
+      margin-right: 5%;
+    }
+    #formular > input,select,textarea,button {
+      width: 90%;
+      margin-bottom:10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="centrat">
+    <div id="formular">
+      <input id="nume_de_familie*" required></input>
+      <input id="initiala_tatalui*" maxlength="1" required></input>
+      <input id="prenume*" required></input>
+      <select id="nivel_studii_absolvit*">
+        <option value="LICENTA">LICENTA</option>
+        <option value="MASTERAT">MASTERAT</option>
+        <option value="DOCTORAT">DOCTORAT</option>
+      </select>
+      <input id="titlu*" placeholder="Studiu retrospectiv privind tuberculoza în județul Constanța" required></input>
+      <select id="facultate*" onchange="medicina()">
+        <option value="1">1. Facultatea de Arte</option>
+        <option value="2">2. Facultatea de Constructii</option>
+        <option value="3">3. Facultateaa de Drept si Stiinte Administrative</option>
+        <option value="4">4. Facultatea de Educatie Fizica si Sport</option>
+        <option value="5">5. Facultatea de Farmacie</option>
+        <option value="6">6. Facultatea de Inginerie Mecanica, Industriala si Maritima</option>
+        <option value="7">7. Facultatea de Istorie si Stiinte Politice</option>
+        <option value="8">8. Facultatea de Litere</option>
+        <option value="9">9. Facultatea de Matematica si Informatica</option>
+        <option value="10">10. Facultatea de Medicina</option>
+        <option value="11">11. Facultatea de Medicina Dentara</option>
+        <option value="12">12. Facultatea de Psihologie si Stiintele Educatiei</option>
+        <option value="13">13. Facultatea de Stiinte Aplicate si Inginerie</option>
+        <option value="14">14. Facultatea de Stiinte Economice</option>
+        <option value="15">15. Facultatea de Stiinte ale Naturii si Stiinte Agricole</option>
+        <option value="16">16. Facultatea de Teologie</option>
+        <option value="17">17. Centrul pentru Invatamant la Distanta si Invatamant cu Frecventa Redusa</option>
+      </select>
+      <input id="domeniu*" value="Sanatate" required></input>
+      <input id="specializare*" value="Medicina" required></input>
+      <select class="specializare_cunoscuta" style="display:none;">
+        <option value="Medicina">Medicina</option>
+        <option value="Medicina (in limba engleza)">Medicina (in limba engleza)</option>
+        <option value="Asistenta Medicala Generala">Asistenta Medicala Generala</option>
+        <option value="Balneo-fiziokinetoterapie si recuperare">Balneo-fiziokinetoterapie si recuperare</option>
+        <option value="Managementul Institutiilor si al Serviciilor Medicale si Farmaceutice">Managementul Institutiilor si al Serviciilor Medicale si Farmaceutice</option>
+      </select>
+      <select id="limba*">
+        <option value="1">1. romana</option>
+        <option value="2">2. engleza</option>
+        <option value="3">3. germana</option>
+        <option value="4">4. franceza</option>
+        <option value="5">5. italiana</option>
+        <option value="6">6. turca</option>
+      </select>
+      <input id="conducator1*" placeholder="Damaschin Floarea" required></input>
+      <input id="conducator2"></input>
+      <textarea id="rezumat*" placeholder="Un rezumat al lucrarii de licenta ce nu va depasi 2500 de caractere" maxlength="2500" rows="15" required></textarea>
+      <input id="termeni_cheie*" placeholder="tbc, tuberculoza, mycobacterium, tuberculosis, constanta, studiu, retrospectiv"></input>
+      <input id="an*"></input>
+      <button class="descarcare" onclick="descarcare()">Descarca!</button>
+    </div>
+  </div>
+  <script>
+    let specializare_cunoscuta = false;
+    let children = document.getElementById("formular").children;
+    let replaceable = [];
+    for (var i = 0; i < children.length; i++) {
+      if (children[i].id == undefined || children[i].id.length < 1) continue;
+
+      var label = document.createElement("p");
+      label.appendChild(document.createTextNode(children[i].id));
+      replaceable.push([label,children[i]]);
+    }
+    for (var i = 0; i < replaceable.length; i++) {
+      var label = replaceable[i][0];
+      var child = replaceable[i][1];
+
+      child.parentNode.insertBefore(label,child);
+    }
+
+    let an = (new Date).getFullYear();
+    document.getElementById("an*").value = an;
+    document.getElementById("an*").placeholder = an;
+
+    function descarcare() {
+      var autor = document.getElementById("nume_de_familie*").value + " " + document.getElementById("initiala_tatalui*").value + ". " + document.getElementById("prenume*").value;
+      var tipul_lucrarii = document.getElementById("nivel_studii_absolvit*").value;
+      var skippable_fields = ["nivel_studii_absolvit*", "nume_de_familie*", "initiala_tatalui*", "prenume*"];
+
+      if (specializare_cunoscuta)
+      {
+        skippable_fields.push("specializare*");
+      }
+
+      if (autor.length < 1)
+      {
+        autor = "NU AI ADAUGAT UN NUME";
+      }
+
+      an = document.getElementById("an*").value;
+      var nume_fisier = "FI_" + tipul_lucrarii + "_" + an + "_" + autor.replace(/([\s\.\-])/gm, ".").replace(/\.+/gm, ".") + ".txt";
+      var continut = genereaza_camp("autor*", autor);
+      for (var i = 0; i < children.length; i++) {
+        //:"(
+        if (specializare_cunoscuta && i == 4)
+        {
+          continut+=genereaza_camp("specializare*", document.getElementsByClassName("specializare_cunoscuta")[0].value);
+        }
+
+        if (children[i].id == undefined || children[i].id.length < 1 || skippable_fields.includes(children[i].id)) continue;
+
+        //camp obligatoriu necompletat
+        if (children[i].id.charAt(children[i].id.length - 1) == "*" && children[i].value.length < 1)
+        {
+          alert("Nu ai completat " + children[i].id);
+          return;
+        }
+
+        //formatam termeni_cheie
+        if (children[i].id == "termeni_cheie*")
+        {
+          var termeni_cheie = document.getElementById("termeni_cheie*").value;
+          termeni_cheie = termeni_cheie.replace(/([\s\,]+[\s\,]*)/gm, ", ");
+          if (termeni_cheie.charAt(termeni_cheie.length-1) == ' ' && termeni_cheie.charAt(termeni_cheie.length-2) == ',') {
+            termeni_cheie = termeni_cheie.substring(0,termeni_cheie.length-2);
+          }
+          continut+=genereaza_camp(children[i].id,termeni_cheie);
+          continue;
+        }
+
+        //adaugam un camp altul decat termeni_cheie
+        continut+=genereaza_camp(children[i].id, children[i].value);
+      }
+      download(nume_fisier, continut);
+    }
+
+    function medicina() {
+      if (document.getElementById("facultate*").value == "10") {
+        document.getElementsByClassName("specializare_cunoscuta")[0].style.display = "block";
+        document.getElementById("specializare*").style.display = "none";
+        specializare_cunoscuta = true;
+      }
+      else {
+        document.getElementsByClassName("specializare_cunoscuta")[0].style.display = "none";
+        document.getElementById("specializare*").style.display = "block";
+        specializare_cunoscuta = false;
+      }
+    }
+
+    function genereaza_camp(nume, valoare) {
+      return nume + ':"' + valoare + '"\n';
+    }
+
+    //https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
+    function download(filename, text) {
+      var element = document.createElement('a');
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+  </script>
+</body>
+</html>
