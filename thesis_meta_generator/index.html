@@ -73,47 +73,85 @@
     </div>
   </div>
   <script>
+    //numele pe care l-am ales pt aceasta variabila nu e cel mai bun
+    //practic, daca utilizatorul selecteaza "facultatea de medicina"
+    //vom arata o lista de specializari in loc sa-l lasam sa scrie el
+    //ce specializare are.
     let specializare_cunoscuta = false;
+    //selectam toate elementele continute de formularul nostru,
+    //pt un motiv anume, am ales ca formularul sa fie <div> nu <form>
+    //dar nu prea conteaza
     let children = document.getElementById("formular").children;
+    //pt a scrie mai putin cod pagina html contine doar niste textbox-uri
+    //pt a adauga text de-asupra lor care sa ghideze utilizatorul
+    //folosesc urmatorul array pt a stoca eticheta ce trebuie adaugata
     let replaceable = [];
+    //pt fiecare element din formular
     for (var i = 0; i < children.length; i++) {
+      //daca este un element valid
       if (children[i].id == undefined || children[i].id.length < 1) continue;
-
+      //creez un nou <p>
       var label = document.createElement("p");
+      //si ii adaug un text, si anume id-ul elementului
       label.appendChild(document.createTextNode(children[i].id));
+      //adaug eticheta in array-ul de mai sus sub forma unui array
+      //unde primul element este <p>-ul nou creat, si al doilea este elementul curent din for loop
+      //adu-ti aminte ca array-urile incep de la 0, totusi
       replaceable.push([label,children[i]]);
     }
+    //pt fiecare eticheta din array-ul de mai sus ce trebuie adaugata
     for (var i = 0; i < replaceable.length; i++) {
+      //pt a fi mai usor separam din nou
+      //label = <p>-ul creat mai sus
       var label = replaceable[i][0];
+      //child este elementul din for loop, este child-ul formularului
       var child = replaceable[i][1];
-
+      //parentNode-ul lui child este chiar <div>-ul cu id-ul formular pe care l-am selectat mai sus
+      //daca iti aduci aminte am mers printre elementele din el pt a-l defini pe acest child
+      //si ce facem aici e ca inaintea elementului deja existent (insertBefore)
+      //e sa adaugam in formular (parentNode) <p>-ul creat (label)
+      //trebuie sa specificam si inaintea carui element din parentNode vrem sa adaugam
+      //deasta dupa cum vezi al doilea parametru dat functiei insertBefore este child
       child.parentNode.insertBefore(label,child);
     }
-
+    //anul curent - (new Date) ne da data curenta, din care luam anul
     let an = (new Date).getFullYear();
+    //si il adaugam ca default in textbox-ul care cere chestia asta
     document.getElementById("an*").value = an;
     document.getElementById("an*").placeholder = an;
 
+    //functia in care generam txt-ul ce urmeaza a fi descarcat
     function descarcare() {
       var autor = document.getElementById("nume_de_familie*").value + " " + document.getElementById("initiala_tatalui*").value + ". " + document.getElementById("prenume*").value;
-      var tipul_lucrarii = document.getElementById("nivel_studii_absolvit*").value;
+      var tipul_lucrarii = document.getElementById("nivel_studii_absolvit*").value; //LICENTA, MASTERAT, DOCTORAT, vezi mai sus
+      //daca nu ma insel, campurile astea sunt folosite doar in numele txt-ului,
+      //deci nu trebuiesc adaugate in fisierul txt, hence the name skippable_fields
       var skippable_fields = ["nivel_studii_absolvit*", "nume_de_familie*", "initiala_tatalui*", "prenume*"];
-
+      
+      //daca facultatea e medicina
       if (specializare_cunoscuta)
       {
+        //specializare* va fi gol pt ca specializare* era un textbox
+        //iar eu adaug pt medicina un select box
         skippable_fields.push("specializare*");
       }
-
       if (autor.length < 1)
       {
         autor = "NU AI ADAUGAT UN NUME";
       }
 
+      //anul luat din textbox-ul cu id-ul "an*", utilizatorul poate modifica anul setat de noi mai sus
       an = document.getElementById("an*").value;
+      //numele fisierului
       var nume_fisier = "FI_" + tipul_lucrarii + "_" + an + "_" + autor.replace(/([\s\.\-])/gm, ".").replace(/\.+/gm, ".") + ".txt";
+      //continutul fisierului, vezi functia genereaza_camp mai jos, e destul de simpla
+      //practic ce face e sa transforme parametrii pe care ii dam in formatul cerut, spre exemplu
+      //autor*: "Ion Ionescu"\n
+      //(\n in programare e new line - are acelasi efect ca si cum ai apasa enter in notepad, gen linie noua)
       var continut = genereaza_camp("autor*", autor);
       for (var i = 0; i < children.length; i++) {
-        //:"(
+        //dupa cum am zis, daca specializarea este cunoscuta, transformam raspunsul selectat 
+        //din selectbox si-l transformam in text
         if (specializare_cunoscuta && i == 4)
         {
           continut+=genereaza_camp("specializare*", document.getElementsByClassName("specializare_cunoscuta")[0].value);
