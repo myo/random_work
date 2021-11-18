@@ -174,6 +174,8 @@
           if (termeni_cheie.charAt(termeni_cheie.length-1) == ' ' && termeni_cheie.charAt(termeni_cheie.length-2) == ',') {
             termeni_cheie = termeni_cheie.substring(0,termeni_cheie.length-2);
           }
+          //la variabila continut adaugam mai mult text si anume rezultatul functiei genereaza_camp
+          //vezi functia mai jos sa intelegi ce face
           continut+=genereaza_camp(children[i].id,termeni_cheie);
           continue;
         }
@@ -191,29 +193,48 @@
     //<select id="facultate*" onchange="medicina()">
     function medicina() {
       if (document.getElementById("facultate*").value == "10") {
+        //facultatea aleasa are id-ul 10, la id-ul 10 se intampla sa avem facultatea de medicina
+        //deci aratam lista cu specializari predefinita de noi mai sus
         document.getElementsByClassName("specializare_cunoscuta")[0].style.display = "block";
+        //si ascundem textbox-ul
+        //display: none; e o proprietate css pe care o poti accesa prin element.style.display
+        //dupa cum vezi mai jos
         document.getElementById("specializare*").style.display = "none";
         specializare_cunoscuta = true;
       }
       else {
+        //facultatea aleasa nu este cea de medicina deci vom ascunde lista de alegeri
         document.getElementsByClassName("specializare_cunoscuta")[0].style.display = "none";
+        //si vom afisa textbox-ul in care utilizatorul este liber sa scrie dupa bunul plac
         document.getElementById("specializare*").style.display = "block";
         specializare_cunoscuta = false;
       }
     }
 
+    //o functie ce nu face altceva decat sa prelucreze key-value-ul
+    //in format-ul care mi s-a cerut
+    //\n intre ghilimele = new line (ENTER)
     function genereaza_camp(nume, valoare) {
+      //exemplu: autor*:"ION IONESCU"(ENTER)
       return nume + ':"' + valoare + '"\n';
     }
 
+    //n-avea sens sa reinventez roata asa ca am cautat chestia de care aveam nevoie pe google
     //https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
     function download(filename, text) {
+      //creeaza un nou element de tip link/a(nchor)
       var element = document.createElement('a');
+      //setam link-ul din element catre un fisier txt din memorie pe care il cream prin magia de mai jos
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      //numele cu care ar trebui sa se salveze fisierul
       element.setAttribute('download', filename);
+      //nu il vrem afisat, pt ca il vom accesa prin cod mai jos
       element.style.display = 'none';
+      //il adaugam in pagina
       document.body.appendChild(element);
+      //ii dam click automat
       element.click();
+      //il stergem din pagina pt ca de fiecare data vom avea nevoie sa cream va avea un continut diferit decat cel setat prin magia de mai sus
       document.body.removeChild(element);
     }
   </script>
