@@ -184,6 +184,11 @@
       download(nume_fisier, continut);
     }
 
+    //daca te duci mai sus o sa vezi ca atunci cand este schimbata facultatea
+    //este rulata functia asta care are rolul de a determina
+    //daca facultatea aleasa este cea de medicina
+    //here you go:
+    //<select id="facultate*" onchange="medicina()">
     function medicina() {
       if (document.getElementById("facultate*").value == "10") {
         document.getElementsByClassName("specializare_cunoscuta")[0].style.display = "block";
